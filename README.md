@@ -19,6 +19,8 @@ El sistema está compuesto por:
 
 ## Diagramas del proyecto.
 Tenemos 3 diagramas bases que muestran la arquitectura, el modelado de los datos y los procesos prinicpales de la página web.
+### Distributed System Diagram
+<img width="1400" height="712" alt="image" src="https://github.com/user-attachments/assets/3ea87522-cc91-40fe-bfac-e06cbff00982" />
 
 ## Ejecución local
 
