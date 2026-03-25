@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiFetch } from '../../services/api';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
@@ -26,14 +27,22 @@ const Register = () => {
     
     setLoading(true);
     
-    setTimeout(() => {
-      console.log('Registro:', { username, email, password });
-      // Guardar token después del registro
-      localStorage.setItem('token', 'fake-token-123');
-      localStorage.setItem('user', JSON.stringify({ email, name: username }));
+    try {
+      // Llamar al backend para registrar
+      await apiFetch('POST', '/auth/register', {
+        name: username,
+        email,
+        password
+      });
+      
+      // Redirigir al login después de registro exitoso
+      navigate('/login');
+      
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
       setLoading(false);
-      navigate('/'); // Redirigir al home después de registro
-    }, 1000);
+    };
   };
 
   return (

@@ -1,22 +1,23 @@
 import './App.css'
-import Chat from './components/home/chat/chatDisplay/chat';
-import { useState } from 'react';
-import ContactList from './components/contactList/contactList';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/Register';
 import HomePage from './pages/Home';
 
-
-
 function App() {
-  const isAuthenticated = !!localStorage.getItem('token');
+  const token = localStorage.getItem('token');
+  const isAuthenticated = !!token;
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/" element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />} />
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route 
+        path="/" 
+        element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />} />
+      <Route 
+        path="*" 
+        element={isAuthenticated ? <Navigate to="/" /> : <Navigate to="/login" />} 
+      />
     </Routes>
   )
 }
