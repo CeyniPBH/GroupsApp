@@ -25,7 +25,7 @@ interface ChatProps {
   contactTag: string;
 }
 
-const Chat = ({ userId, contactId, contactName, contactTag }: ChatProps) => {
+const Chat = ({ userId, contactId, contactName}: ChatProps) => {
   const [chatId, setChatId] = useState<number | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
