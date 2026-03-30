@@ -4,6 +4,7 @@ import MessagesList from '../messageList/MessageList';
 import Navbar from '../../navbar/Navbar';
 import { chatsAPI } from '../../../../services/api';
 import {getSocket} from '../../../../services/socket';
+import type { MessageItem } from '../message/Message';
 
 interface Message {
   id: number;
@@ -20,42 +21,18 @@ interface Message {
 
 interface ChatProps {
   userId: number;
-  contactId: number;
-  contactName: string;
-  contactTag: string;
+  chatId: number;
+  chatName: string;
+  chatType: 'contact' | 'group';
 }
 
-const Chat = ({ userId, contactId, contactName}: ChatProps) => {
-  const [chatId, setChatId] = useState<number | null>(null);
+const Chat = ({ userId, chatId, chatName, chatType }: ChatProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socket = getSocket();
 
-  useEffect(() => {
-    if (!contactId) return;
-    
-    const getOrCreateChat = async () => {
-      try {
-        console.log('🔍 Creando/obteniendo chat con contacto:', contactId);
-        const res = await chatsAPI.createChat({
-          type: 'direct',
-          participantIds: [contactId]
-        });
-        
-        const newChatId = res.data.id;
-        console.log('✅ Chat ID:', newChatId);
-        setChatId(newChatId);
-        
-      } catch (error) {
-        console.error('❌ Error creando/obteniendo chat:', error);
-      }
-    };
-    
-    getOrCreateChat();
-  }, [contactId]);
-
-  // 2. Cargar mensajes cuando tenemos chatId
+  // 1. Cargar mensajes cuando tenemos chatId
   useEffect(() => {
     if (!chatId) return;
     
@@ -74,13 +51,13 @@ const Chat = ({ userId, contactId, contactName}: ChatProps) => {
     
     loadMessages();
     
-    // 3. Unirse al chat por socket
+    // 2. Unirse al chat por socket
     if (socket && socket.connected) {
       console.log('🔗 Uniéndose al chat:', chatId);
       socket.emit('joinChat', chatId);
     }
     
-    // 4. Limpiar al desmontar
+    // 3. Limpiar al desmontar
     return () => {
       if (socket && socket.connected) {
         console.log('🔌 Saliendo del chat:', chatId);
@@ -89,7 +66,7 @@ const Chat = ({ userId, contactId, contactName}: ChatProps) => {
     };
   }, [chatId, socket]);
 
-  // 5. Escuchar mensajes nuevos
+  // 4. Escuchar mensajes nuevos
   useEffect(() => {
     if (!socket) return;
     
@@ -113,12 +90,12 @@ const Chat = ({ userId, contactId, contactName}: ChatProps) => {
     };
   }, [socket, chatId]);
 
-  // 6. Auto-scroll al último mensaje
+  // 5. Auto-scroll al último mensaje
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // 7. Enviar mensaje
+  // 6. Enviar mensaje
   const handleSendMessage = async (content: string) => {
     if (!content.trim() || !chatId) return;
     
@@ -153,16 +130,18 @@ const Chat = ({ userId, contactId, contactName}: ChatProps) => {
   };
 
   // Formatear mensajes para MessagesList
-  const formattedMessages = messages.map(m => ({
-  id: m.id,
-  content: m.content,
-  isMine: m.senderId === userId,
-  senderName: m.sender?.name || (m.senderId === userId ? 'Tú' : contactName)
-}));
-console.log('contactName:', contactName);
+  const formattedMessages: MessageItem[] = messages.map(m => ({
+    id: m.id,
+    content: m.content,
+    isMine: m.senderId === userId,
+    senderName: chatType === 'group' 
+      ? (m.sender?.name || (m.senderId === userId ? 'Tú' : 'Usuario'))
+      : (m.senderId === userId ? 'Tú' : chatName)
+  }));
+
   return (
     <div className="flex flex-col h-full">
-      <Navbar userName={contactName} />
+      <Navbar userName={chatName} />
       
       <section id="messages" className='flex-1 overflow-y-auto'>
         {loading ? (

@@ -3,21 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import ContactList from '../components/contactList/contactList';
 import Chat from '../components/home/chat/chatDisplay/chat';
 import { connectSocket, disconnectSocket } from '../services/socket';
-import type { User } from '../components/contactList/contactList.types';
+import type { User ,SelectableItem} from '../components/contactList/contactList.types';
 
-type Contact = {
-  id: number;
-  userId: number;
-  contactId: number;
-  status: string;
-  requester: User;
-  receiver: User;
-};
 
 const HomePage = () => {
   const navigate = useNavigate();
   const [usuarioActual, setUsuarioActual] = useState<User | null>(null);
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [selectedItem, setSelectedItem] = useState<SelectableItem | null>(null);
   
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -43,27 +35,28 @@ const HomePage = () => {
       disconnectSocket();
     };
   }, [navigate]);
-  const contactoReal = selectedContact
-  ? (selectedContact.requester.id === usuarioActual?.id
-      ? selectedContact.receiver
-      : selectedContact.requester)
-  : null;
+
+  const handleSelectItem = (item: SelectableItem) => {
+    console.log('📌 Seleccionado:', item);
+    setSelectedItem(item);
+  };
   return (
     <div id="app" className="flex h-screen w-full">
       <ContactList
         usuarioActual={usuarioActual}
-        onSelectContacto={(contacto) => setSelectedContact(contacto as any)}
+        onSelectItem={handleSelectItem}
       />
       <section id="chat" className='h-full w-3/5 bg-gray-800 flex flex-col'>
         
-        {usuarioActual && selectedContact ? (
+        {usuarioActual && selectedItem ? (
           <Chat
-            key={selectedContact.id}
+            key={`${selectedItem.type}-${selectedItem.id}`}
             userId={usuarioActual.id}
-            contactId={contactoReal!.id}
-            contactName={contactoReal!.name}
-            contactTag={contactoReal!.tag}
-          />) : (
+            chatId={selectedItem.id}
+            chatName={selectedItem.name}
+            chatType={selectedItem.type}
+          />
+        ) : (
           <div className="flex items-center justify-center h-full text-gray-500">
             Selecciona un contacto para empezar a chatear
           </div>

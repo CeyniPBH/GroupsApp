@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { contactsAPI, usersAPI } from '../../services/api';
-import type { User, PendingRequest } from './contactList.types';
-
+import type { User, PendingRequest,SelectableItem } from './contactList.types';
+import { chatsAPI } from '../../services/api';
 export const useContactList = (
   usuarioActual: User | null,
-  onSelectContacto: (contacto: User) => void
+  onSelectItem: (item: SelectableItem) => void
 ) => {
   const [contactos, setContactos] = useState<User[]>([]);
+  const [chats, setChats] = useState<any[]>([]);
   const [usuariosDisponibles, setUsuariosDisponibles] = useState<User[]>([]);
   const [popUpAbierto, setPopUpAbierto] = useState(false);
   
@@ -14,6 +15,41 @@ export const useContactList = (
   const [popUpSolicitudesAbierto, setPopUpSolicitudesAbierto] = useState(false);
   const [notificaciones, setNotificaciones] = useState(0);
 
+
+  //crear grupo 
+  const crearGrupo = async (name: string, participantes: User[]) => {
+  try {
+    const res = await chatsAPI.createChat({
+      type: 'group',
+      name,
+      participantIds: participantes.map(p => p.id),
+    });
+
+    setChats(prev => [res.data, ...prev]);
+    onSelectItem({
+      id: res.data.id,
+      name: name,
+      tag: '',
+      type: 'group'
+    });
+
+  } catch (error) {
+    console.error('Error creando grupo:', error);
+  }
+};
+  //cargar grupos
+  useEffect(() => {
+  const cargarChats = async () => {
+    try {
+      const res = await chatsAPI.getChats();
+      setChats(res.data || []);
+    } catch (error) {
+      console.error('Error cargando chats:', error);
+    }
+  };
+
+  cargarChats();
+}, []);
   // Cargar contactos aceptados
   useEffect(() => {
     if (!usuarioActual) return;
@@ -122,7 +158,14 @@ useEffect(() => {
       setContactos(prev => prev.filter(c => c.id !== usuario.id));
       if (usuarioActual?.id === usuario.id) {
         const siguiente = contactos.filter(c => c.id !== usuario.id)[0];
-        onSelectContacto(siguiente || null!);
+        if (siguiente) {
+          onSelectItem({
+            id: siguiente.id,
+            name: siguiente.name,
+            tag: siguiente.tag,
+            type: 'contact'
+          });
+        }
       }
     } catch (error) {
       console.error('Error eliminando contacto:', error);
@@ -176,5 +219,7 @@ useEffect(() => {
     notificaciones,
     aceptarSolicitud,
     rechazarSolicitud,
+    crearGrupo,
+    chats,
   };
 };
