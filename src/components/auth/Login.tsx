@@ -32,7 +32,7 @@ const Login = () => {
   console.log('✅ Token guardado:', data.token);
   
   // Redirigir al home
-  window.location.href = '/';
+  navigate('/');
   
 } catch (err: any) {
   console.log('❌ Error capturado:', err);
