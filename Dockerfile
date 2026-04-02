@@ -1,5 +1,5 @@
 # Stage 1: Build the React app
-FROM node:18-alpine AS build
+FROM node:22-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -19,8 +19,6 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d
 # Este script sustituirá la variable de entorno al iniciar el contenedor
 COPY entrypoint.sh /entrypoint.sh
-# Arreglar los finales de línea de Windows (CRLF -> LF) para que el script sea compatible con Linux
-RUN sed -i 's/\r$//' /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 EXPOSE 80
 ENTRYPOINT ["/entrypoint.sh"]
