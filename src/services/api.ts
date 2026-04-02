@@ -15,7 +15,7 @@ export async function apiFetch(method: string, endpoint: string, body?: any) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  const response = await fetch(url, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
@@ -42,6 +42,20 @@ api.interceptors.request.use((config: any) => {
   }
   return config;
 });
+
+// Interceptor de respuesta: Manejo global de errores (Ej. Token expirado)
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      console.warn('Token expirado o inválido. Cerrando sesión automáticamente...');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/'; // O la ruta que corresponda a tu Login
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;
 
