@@ -28,5 +28,5 @@ We have three base diagrams that show the architecture, the data modeling, and t
 
 ## Ejecución local
 
-```bash
-docker-compose up
+## Video.
+https://drive.google.com/drive/folders/1csj9aPvFyM9hp8GSQxcb3aEKEmG361Jq?usp=sharing
