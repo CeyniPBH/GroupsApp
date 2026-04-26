@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL;
+const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 let socket: Socket | null = null;
 
@@ -12,7 +12,10 @@ export const connectSocket = (token: string) => {
 
   socket = io(SOCKET_URL, {
     auth: { token },
-    transports: ['websocket', 'polling'],
+    // ⚠️ CRÍTICO: Forzamos WebSockets desde el inicio para evitar 
+    // el error "Session ID unknown" con el Load Balancer de AWS.
+    transports: ['websocket'],
+    upgrade: false,
     autoConnect: true,
   });
   socket.on('connect', () => {

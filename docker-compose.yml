@@ -10,4 +10,4 @@ services:
     environment:
       # Ahora la URL se pasa en tiempo de ejecución, no de construcción.
       # En AWS, esto vendría de la configuración de la tarea de ECS o similar.
-      - VITE_API_URL=http://34.226.227.26:3000
+      - VITE_API_URL=${VITE_API_URL:-http://34.226.227.26:3000}
