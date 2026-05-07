@@ -5,19 +5,13 @@ import RegisterPage from './pages/Register';
 import HomePage from './pages/Home';
 
 function App() {
-  const token = localStorage.getItem('token');
-  const isAuthenticated = !!token;
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route 
-        path="/" 
-        element={isAuthenticated ? <HomePage /> : <Navigate to="/login" />} />
-      <Route 
-        path="*" 
-        element={isAuthenticated ? <Navigate to="/" /> : <Navigate to="/login" />} 
-      />
+      {/* HomePage ya se encarga de proteger la ruta internamente */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )
 }

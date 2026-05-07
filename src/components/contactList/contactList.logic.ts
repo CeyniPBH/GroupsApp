@@ -81,9 +81,9 @@ export const useContactList = (
         // El contacto es el otro usuario (no yo)
         const otroUsuario = c.userId === usuarioActual?.id ? c.receiver : c.requester;
         return {
-          id: otroUsuario.id,
-          name: otroUsuario.name,
-          tag: otroUsuario.tag,
+            id: otroUsuario?.id,
+            name: otroUsuario?.name,
+            tag: otroUsuario?.tag,
           status: c.status,
         };
       });
@@ -140,7 +140,7 @@ useEffect(() => {
   }
   const cargarUsuarios = async () => {
     try {
-      const res = await usersAPI.search('a');
+      const res = await usersAPI.search('');
       
       // La respuesta puede estar en res.data o directamente en res
       let usuarios = Array.isArray(res.data) ? res.data : [];
@@ -172,7 +172,17 @@ useEffect(() => {
       await contactsAPI.addContact(usuario.id);
       // Recargar contactos
       const res = await contactsAPI.getContacts();
-      const contactosAceptados = res.data.filter((c: any) => c.status === 'accepted');
+      const contactosAceptados = res.data
+        .filter((c: any) => c.status === 'accepted')
+        .map((c: any) => {
+          const otroUsuario = c.userId === usuarioActual?.id ? c.receiver : c.requester;
+          return {
+            id: otroUsuario?.id,
+            name: otroUsuario?.name,
+            tag: otroUsuario?.tag,
+            status: c.status,
+          };
+        });
       setContactos(contactosAceptados);
       setPopUpAbierto(false);
     } catch (error) {
@@ -184,17 +194,6 @@ useEffect(() => {
     try {
       await contactsAPI.removeContact(usuario.id);
       setContactos(prev => prev.filter(c => c.id !== usuario.id));
-      if (usuarioActual?.id === usuario.id) {
-        const siguiente = contactos.filter(c => c.id !== usuario.id)[0];
-        if (siguiente) {
-          onSelectItem({
-            id: siguiente.id,
-            name: siguiente.name,
-            tag: siguiente.tag,
-            type: 'contact'
-          });
-        }
-      }
     } catch (error) {
       console.error('Error eliminando contacto:', error);
     }
@@ -210,9 +209,19 @@ useEffect(() => {
       setSolicitudesPendientes(prev => prev.filter(r => r.id !== contactId));
       setNotificaciones(prev => prev - 1);
       
-      // Recargar contactos
+      // Recargar contactos desde el servidor para tener el formato correcto
       const res = await contactsAPI.getContacts();
-      const contactosAceptados = res.data.filter((c: any) => c.status === 'accepted');
+      const contactosAceptados = res.data
+        .filter((c: any) => c.status === 'accepted')
+        .map((c: any) => {
+          const otroUsuario = c.userId === usuarioActual?.id ? c.receiver : c.requester;
+          return {
+            id: otroUsuario?.id,
+            name: otroUsuario?.name,
+            tag: otroUsuario?.tag,
+            status: c.status,
+          };
+        });
       setContactos(contactosAceptados);
       
     } catch (error) {

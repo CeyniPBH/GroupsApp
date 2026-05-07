@@ -20,18 +20,6 @@
 /* Drawer */
 .md-drawer {
   position: fixed;
-  right: 0;
-  width: 90%;
-  max-width: 380px;
-  background: var(--accent);
-  color: white;
-  z-index: 70;
-  display: flex;
-  flex-direction: column;
-  box-shadow: -10px 0 30px rgba(0,0,0,0.4);
-}
-.md-drawer {
-  position: fixed;
   top: 80px; /* por defecto debajo del navbar */
   right: 0;
   height: calc(100vh - 80px);

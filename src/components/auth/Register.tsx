@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiFetch } from '../../services/api';
+import api from '../../services/api';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -27,14 +27,15 @@ const Register = () => {
 
     setLoading(true);
     try {
-      await apiFetch('POST', '/auth/register', {
+      await api.post('/auth/register', {
         name: username,
         email,
         password
       });
       navigate('/login');
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Error al registrarse';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

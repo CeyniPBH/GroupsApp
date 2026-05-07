@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiFetch } from '../../services/api';
+import api from '../../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -21,24 +21,23 @@ const Login = () => {
     }
     
     try {
-  const data = await apiFetch('POST', '/auth/login', {
-    email,
-    password
-  });
-  
-  // Guardar token y usuario en localStorage
-  localStorage.setItem('token', data.token);
-  localStorage.setItem('user', JSON.stringify(data.user));
-  console.log('✅ Token guardado:', data.token);
-  
-  // Redirigir al home
-  window.location.href = '/';
-  
-} catch (err: any) {
-  console.log('❌ Error capturado:', err);
-  console.log('❌ Mensaje de error:', err.message);
-  setError(err.message);
-}finally {
+      const response = await api.post('/auth/login', {
+        email,
+        password,
+      });
+      const { token, user } = response.data;
+
+      // Guardar token y usuario en localStorage
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      console.log('✅ Token guardado:', token);
+
+      // Redirigir al home
+      navigate('/');
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Error al iniciar sesión';
+      setError(errorMessage);
+    } finally {
       setLoading(false);
     }
   };

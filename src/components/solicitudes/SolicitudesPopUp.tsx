@@ -1,4 +1,4 @@
-import type { PendingRequest, User } from '../contactList/contactList.types';
+import type { PendingRequest } from '../contactList/contactList.types';
 
 interface SolicitudesPopUpProps {
   solicitudes: PendingRequest[];

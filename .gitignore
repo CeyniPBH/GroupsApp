@@ -6,20 +6,23 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-.env
-.env.local
+
+# Dependencias
 node_modules
+
+# Directorios de build (producción)
 dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Archivos de Sistema Operativo o Editor
+.DS_Store
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
-*.sw?
+
+# Variables de Entorno
+.env

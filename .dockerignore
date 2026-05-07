@@ -1,0 +1,18 @@
+# Dependencias locales (¡Lo más importante a ignorar!)
+node_modules
+
+# Builds locales anteriores
+dist
+dist-ssr
+
+# Archivos de Git
+.git
+.gitignore
+
+# Archivos de entorno local (por seguridad, no deben ir en la imagen)
+.env
+.env.local
+
+# Archivos de Docker (opcional, pero buena práctica)
+Dockerfile
+docker-compose.yml
